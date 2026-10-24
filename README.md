@@ -15,7 +15,7 @@ The code uses `wl-copy`, as well as `pipe`. So, the requirements are basically a
 > Example
 `awPass 69-420 webflyx` generates a password for `webflyx` based on `69-420`.
 `setKey 420-69` changes the key from `69-420` to `420-69`.
-Then Rebuild
+Then Rebuild.
 To get the old password run `awPass 420-69 69-420 webflyx`.
 Then go to `webflyx`, change your password.
 Use `awPass 420-60 webflyx` to get the new password.
@@ -30,7 +30,7 @@ Use `awPass 420-60 webflyx` to get the new password.
 ## High-Level Overview
 1. `setKey` simply creates a file `key.h` which is imported as a module in `main.cpp`.
 `key.h` only has one line.
-```
+```c
 std::string key = "";
 ```
 `setKey <Key>` runs `hash(Key)`; and stores the hash in `key.h`.
@@ -45,7 +45,7 @@ std::string key = "";
 A basic function what simply copies a string into the clipboard using `wl-copy`
 
 *clipboard.h*
-```
+```c
 void string2clipboard(std::string s) {
     FILE* p = popen("wl-copy", "w");
     fwrite(s.data(), 1, s.size(), p);
@@ -55,7 +55,7 @@ void string2clipboard(std::string s) {
 ### Setting the key
 Loads the `key.h` file.
 *setKey.cpp*
-```
+```c
 int main(int argc, char* argv[]) {
     if (argc != 2) wrongInput();
     std::string input = argv[1];
@@ -72,7 +72,7 @@ Clearly `hash(std::string str)` does all the heavy-lifting here.
 Really more of a consistent password generator, but who cares.
 
 *main.cpp*
-```
+```c
 int main(int argc, char* argv[]) {
 
     if(argc == 3) {
@@ -102,7 +102,7 @@ The way the hash works is not by first generating an array of 64 numbers each be
 > All passwords generated are simply a different purmutation of the original character set.
 
 The character set I am using here is given by,
-```
+```c
 std::array<char, 64> characters = {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -112,7 +112,7 @@ std::array<char, 64> characters = {
 ```
 ### The hash
 Really, the whole reason why I made this project in the first place.
-```
+```c
 std::string hash(std::string service) {
     //1 - Convert the Service to a bunch of numbers
     std::vector<int> numbers = n_service(service);
@@ -160,7 +160,7 @@ std::string hash(std::string service) {
 ```
 
 1. Converting a string into numbers based on the character set.
-```
+```c
 std::vector<int> n_service(const std::string& service) {
     int l = service.length();
     std::vector<int> n(l, -1);
@@ -175,7 +175,7 @@ std::vector<int> n_service(const std::string& service) {
 ```
 2. Since 6-bit ints are not an existing datatype, bitwise operators do not apply and we will wave to make our own.
 *Converting into Binary*
-```
+```c
 std::array<bool, 6> toBinary(int number) {
     std::array<bool,6> bin;
     for (int i =5; i >=0; i--) {
@@ -186,7 +186,7 @@ std::array<bool, 6> toBinary(int number) {
 }
 ```
 *The Bitwise Left and Right Shifts*
-```
+```c
 namespace shift {
     std::array<bool,6> left(std::array<bool,6> bin, int count) {
         for (int x = 0; x < count; x++) {
@@ -210,7 +210,7 @@ namespace shift {
 }
 ```
 3. Since the shifting is incremental, there will be repeating patterns no matter what. Even if we reverse and shift again. So, I mix each bit with its neighbouring bits both before and after reversing. This removes any patters and adds that sweet effect of changing the key slightly to change the hash significantly.
-```
+```c
 std::vector<std::array<bool, 6>> mix_neighbours(std::vector<std::array<bool, 6>> org) {
     std::vector<std::array<bool, 6>> result = org;
     int next;
