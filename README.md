@@ -34,8 +34,11 @@ Use `awPass 420-60 webflyx` to get the new password.
 std::string key = "";
 ```
 `setKey <Key>` runs `hash(Key)`; and stores the hash in `key.h`.
+
 2. In `main.cpp` (the code which runs upon running `awPass <Key> <Service>`), first `hash(Key)` is calculated and checked against `key` from `key.h`.
+
 3. If you ran `awPass <Key> <Service>` then `hash(Key+Service)` is copied to clipboard using `wl-copy < `.
+
 4. If you ran `awPass <Key> <OldKey> <Service>` then `hash(OldKey+Service)` is copied to the clipboard.
 ## Low Level Overview
 ### The Pipe
